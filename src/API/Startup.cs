@@ -1,4 +1,5 @@
 ﻿using API.ExceptionHandlers;
+using API.Workers.Outbox;
 using Application;
 using Infrastructure;
 
@@ -14,6 +15,8 @@ namespace API
         {
             services.AddApplication();
             services.AddInfrastructure(Configuration);
+
+            services.AddHostedService<ProcessadorOutboxBackgroundService>();
 
             services.AddControllers();
 

@@ -40,8 +40,8 @@ https://localhost:8080/swagger
 
 - Para aplicar migrações do Entity Framework Core, utilize o seguinte comando:
 
-  dotnet ef migrations add "Example" -p src/Infrastructure -s src/API -o Migrations
+dotnet ef migrations add "Example" -p src/Infrastructure -s src/API -o Migrations
 
 - Para remover a última migração, utilize: 
 
-  dotnet ef migrations remove -p src/Infrastructure -s src/API --force
+dotnet ef migrations remove -p src/Infrastructure -s src/API --force
