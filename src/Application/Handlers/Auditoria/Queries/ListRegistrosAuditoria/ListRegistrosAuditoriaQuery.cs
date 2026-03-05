@@ -9,12 +9,12 @@ using Gridify;
 
 namespace Application.Handlers.Auditoria.Queries.ListRegistrosAuditoria
 {
-    public class ListRegistrosAuditoriaQuery : GridifyQuery, IRequestWrapper<PaginatedList<RegistroAuditoriaDTO>>
+    public class ListRegistrosAuditoriaQuery : GridifyQuery, IRequestWrapper<ListaPaginada<RegistroAuditoriaDTO>>
     {        
         
     }
 
-    public class ListRegistrosAuditoriaQueryHandler : IHandlerWrapper<ListRegistrosAuditoriaQuery, PaginatedList<RegistroAuditoriaDTO>>
+    public class ListRegistrosAuditoriaQueryHandler : IHandlerWrapper<ListRegistrosAuditoriaQuery, ListaPaginada<RegistroAuditoriaDTO>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ namespace Application.Handlers.Auditoria.Queries.ListRegistrosAuditoria
             _context = context;
             _mapper = mapper;
         }
-        public async Task<Response<PaginatedList<RegistroAuditoriaDTO>>> Handle(ListRegistrosAuditoriaQuery request, CancellationToken cancellationToken)
+        public async Task<Resposta<ListaPaginada<RegistroAuditoriaDTO>>> Handle(ListRegistrosAuditoriaQuery request, CancellationToken cancellationToken)
         {
             var mapper = new GridifyMapper<RegistroAuditoria>()
                 .GenerateMappings();
@@ -31,12 +31,12 @@ namespace Application.Handlers.Auditoria.Queries.ListRegistrosAuditoria
             var gridifyQueryable = _context.RegistrosAuditoria
                .GridifyQueryable(request, mapper);
 
-            var paginatedList = await gridifyQueryable.ProjectToPaginatedListAsync<RegistroAuditoria, RegistroAuditoriaDTO>(
+            var paginatedList = await gridifyQueryable.ProjectToListaPaginadaAsync<RegistroAuditoria, RegistroAuditoriaDTO>(
                 _mapper.ConfigurationProvider,
                 request.Page,
                 request.PageSize,
                 cancellationToken);
-            return Response.Success(paginatedList);
+            return Resposta.Success(paginatedList);
         }
     }
 }

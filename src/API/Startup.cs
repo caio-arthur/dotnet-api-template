@@ -3,7 +3,7 @@ using API.Workers.Outbox;
 using Application;
 using Infrastructure;
 using Infrastructure.Persistence.Outbox;
-using Microsoft.Extensions.Configuration;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace API
 {
@@ -40,7 +40,11 @@ namespace API
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.DocExpansion(DocExpansion.None);
+                    c.DefaultModelsExpandDepth(-1);
+                });
             }
 
             app.UseHttpsRedirection();

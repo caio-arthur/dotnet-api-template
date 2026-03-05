@@ -4,9 +4,9 @@ namespace Application.Common.Exceptions
 {
     public class ValidationException : Exception
     {
-        public Error Error { get; }
+        public Erro Error { get; }
 
-        public ValidationException(Error error) : base(error.Mensagem)
+        public ValidationException(Erro error) : base(error.Mensagem)
         {
             Error = error;
         }

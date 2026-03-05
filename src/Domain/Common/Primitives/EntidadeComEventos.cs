@@ -2,7 +2,7 @@
 
 namespace Domain.Common.Primitives
 {
-    public abstract class EntidadeBase
+    public abstract class EntidadeComEventos
     {
         private readonly List<IEventoDeDominio> _eventosDeDominio = [];
 

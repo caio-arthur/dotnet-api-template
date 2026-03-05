@@ -11,7 +11,7 @@ namespace API.Controllers
         private ISender _mediator;
         protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetService<ISender>();
 
-        protected ActionResult HandleResult(Response result)
+        protected ActionResult HandleResult(Resposta result)
         {
             if (result.Sucesso)
             {
@@ -22,7 +22,7 @@ namespace API.Controllers
             return StatusCode(statusCode, result);
         }
 
-        protected ActionResult HandleResult<T>(Response<T> result)
+        protected ActionResult HandleResult<T>(Resposta<T> result)
         {
             if (result.Sucesso)
             {

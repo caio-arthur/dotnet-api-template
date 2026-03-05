@@ -22,7 +22,7 @@ namespace Application.Handlers.Auditoria.Commands.RecuperarRegistroExcluido
             _context = context;
         }
 
-        public async Task<Response<RecuperarRegistroExcluidoResponse>> Handle(RecuperarRegistroExcluidoCommand request, CancellationToken cancellationToken)
+        public async Task<Resposta<RecuperarRegistroExcluidoResponse>> Handle(RecuperarRegistroExcluidoCommand request, CancellationToken cancellationToken)
         {
             var auditoria = await _context.RegistrosAuditoria
                 .FirstAsync(a => a.Id == request.Id, cancellationToken);
@@ -36,17 +36,17 @@ namespace Application.Handlers.Auditoria.Commands.RecuperarRegistroExcluido
             {
                 var entidadeRecuperada = JsonSerializer.Deserialize(auditoria.ValoresAntigos!, clrType);
 
-                if (entidadeRecuperada is null) return Response.Failure<RecuperarRegistroExcluidoResponse>(Error.FalhaDesserializacao);
+                if (entidadeRecuperada is null) return Resposta.Failure<RecuperarRegistroExcluidoResponse>(Erro.FalhaDesserializacao);
 
                 _context.Add(entidadeRecuperada);
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return Response.Success(new RecuperarRegistroExcluidoResponse(auditoria.ChavePrimaria, "Registro recuperado com sucesso!"));
+                return Resposta.Success(new RecuperarRegistroExcluidoResponse(auditoria.ChavePrimaria, "Registro recuperado com sucesso!"));
             }
             catch (Exception ex)
             {
-                return Response.Failure<RecuperarRegistroExcluidoResponse>(Error.Default);
+                return Resposta.Failure<RecuperarRegistroExcluidoResponse>(Erro.Default);
             }
         }
     }

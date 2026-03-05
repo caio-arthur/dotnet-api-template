@@ -23,7 +23,7 @@ namespace API.ExceptionHandlers
             _logger.LogError(exception, "Ocorreu uma exceção: {Message}", exception.Message);
 
             var statusCode = (int)HttpStatusCode.InternalServerError;
-            var errorResponse = Error.Default;
+            var errorResponse = Erro.Default;
 
             if (exception is DomainException domainEx)
             {
@@ -44,7 +44,7 @@ namespace API.ExceptionHandlers
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            var json = JsonSerializer.Serialize(Response.Failure(errorResponse), jsonOptions);
+            var json = JsonSerializer.Serialize(Resposta.Failure(errorResponse), jsonOptions);
 
             await httpContext.Response.WriteAsync(json, cancellationToken);
 

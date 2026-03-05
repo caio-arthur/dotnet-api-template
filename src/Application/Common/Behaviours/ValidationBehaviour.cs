@@ -32,15 +32,15 @@ namespace Application.Common.Behaviours
                 if (failures.Any())
                 {
                     var firstFailure = failures.First();
-                    Error error;
+                    Erro error;
 
-                    if (firstFailure.CustomState is Error customError)
+                    if (firstFailure.CustomState is Erro customError)
                     {
                         error = customError;
                     }
                     else
                     {
-                        error = new Error(400, "Validation.Error", firstFailure.ErrorMessage);
+                        error = new Erro(400, "Validation.Error", firstFailure.ErrorMessage);
                     }
 
                     throw new ValidationException(error);
