@@ -1,6 +1,8 @@
 ﻿using Infrastructure.Persistence;
+using Infrastructure.Persistence.Outbox;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace API.Workers.Outbox
@@ -8,60 +10,77 @@ namespace API.Workers.Outbox
     public class ProcessadorOutboxBackgroundService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-
-        public ProcessadorOutboxBackgroundService(IServiceProvider serviceProvider)
+        private readonly ILogger<ProcessadorOutboxBackgroundService> _logger;
+        private readonly int _intervaloEmSegundos;
+        public ProcessadorOutboxBackgroundService(
+                IServiceProvider serviceProvider,
+                IOptions<OutboxOptions> options,
+                ILogger<ProcessadorOutboxBackgroundService> logger)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
+            _intervaloEmSegundos = options.Value.IntervaloEmSegundos > 0 ? options.Value.IntervaloEmSegundos : 10;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Roda a cada 10 segundos
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+            _logger.LogInformation("Outbox Background Service iniciado. Intervalo: {Intervalo}s", _intervaloEmSegundos);
+
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_intervaloEmSegundos));
 
             while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
             {
-                // Como é um Singleton (BackgroundService), precisamos de um Scope para usar Scoped Services (DbContext, MediatR)
-                using var scope = _serviceProvider.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
-
-                // Busca as mensagens não processadas (Pode limitar com .Take(20) para não travar)
-                var mensagens = await dbContext.MensagensOutbox
-                    .Where(m => m.DataProcessamento == null)
-                    .OrderBy(m => m.DataCriacao)
-                    .Take(20)
-                    .ToListAsync(stoppingToken);
-
-                foreach (var mensagem in mensagens)
+                try
                 {
-                    try
-                    {
-                        // Deserializa de volta para o evento original
-                        var tipoEvento = Type.GetType(mensagem.Tipo);
-                        if (tipoEvento == null) continue;
-
-                        var evento = JsonSerializer.Deserialize(mensagem.Conteudo, tipoEvento);
-                        if (evento is not INotification notificacao) continue;
-
-                        // Dispara o evento
-                        await publisher.Publish(notificacao, stoppingToken);
-
-                        // Marca como processado
-                        mensagem.DataProcessamento = DateTime.Now;
-                    }
-                    catch (Exception ex)
-                    {
-                        // Fire and forget focado na estabilidade: salva o log e segue a vida
-                        mensagem.Erro = ex.Message;
-                    }
+                    await ProcessarMensagensAsync(stoppingToken);
                 }
-
-                if (mensagens.Any())
+                catch (Exception ex)
                 {
-                    await dbContext.SaveChangesAsync(stoppingToken);
+                    _logger.LogError(ex, "Ocorreu um erro fatal ao processar o Outbox.");
                 }
             }
+        }
+
+        private async Task ProcessarMensagensAsync(CancellationToken stoppingToken)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
+
+            var mensagens = await dbContext.MensagensOutbox
+                .Where(m => m.DataProcessamento == null)
+                .OrderBy(m => m.DataCriacao)
+                .Take(20)
+                .ToListAsync(stoppingToken);
+
+            if (!mensagens.Any()) return;
+
+            foreach (var mensagem in mensagens)
+            {
+                try
+                {
+                    var tipoEvento = Type.GetType(mensagem.Tipo);
+                    if (tipoEvento == null)
+                    {
+                        mensagem.Erro = $"Tipo não encontrado: {mensagem.Tipo}";
+                        continue;
+                    }
+
+                    var evento = JsonSerializer.Deserialize(mensagem.Conteudo, tipoEvento);
+                    if (evento is INotification notificacao)
+                    {
+                        await publisher.Publish(notificacao, stoppingToken);
+                        mensagem.DataProcessamento = DateTime.UtcNow;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    mensagem.Erro = ex.Message;
+                    _logger.LogWarning(ex, "Erro ao processar mensagem do Outbox ID {Id}", mensagem.Id);
+                }
+            }
+
+            await dbContext.SaveChangesAsync(stoppingToken);
         }
     }
 }

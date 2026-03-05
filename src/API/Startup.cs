@@ -2,6 +2,8 @@
 using API.Workers.Outbox;
 using Application;
 using Infrastructure;
+using Infrastructure.Persistence.Outbox;
+using Microsoft.Extensions.Configuration;
 
 namespace API
 {
@@ -16,7 +18,12 @@ namespace API
             services.AddApplication();
             services.AddInfrastructure(Configuration);
 
-            services.AddHostedService<ProcessadorOutboxBackgroundService>();
+            services.Configure<OutboxOptions>(Configuration.GetSection(OutboxOptions.SectionName));
+            var outboxOptions = Configuration.GetSection(OutboxOptions.SectionName).Get<OutboxOptions>();
+            if (outboxOptions is not null && outboxOptions.Habilitado)
+            {
+                services.AddHostedService<ProcessadorOutboxBackgroundService>();
+            }
 
             services.AddControllers();
 

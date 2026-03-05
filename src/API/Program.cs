@@ -20,7 +20,7 @@ namespace API
                 catch (Exception ex)
                 {
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while starting the application.");
+                    logger.LogError(ex, "Ocorreu um erro ao iniciar o aplicativo.");
                     throw;
                 }
             }

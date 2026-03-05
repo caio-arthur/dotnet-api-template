@@ -32,5 +32,14 @@ namespace Application.Common.Models
         public static Error BadGateway => new Error(502, nameof(BadGateway), "O servidor recebeu uma resposta inválida de um serviço upstream.");
         public static Error ServiceUnavailable => new Error(503, nameof(ServiceUnavailable), "O serviço está temporariamente indisponível.");
         public static Error GatewayTimeout => new Error(504, nameof(GatewayTimeout), "O servidor não recebeu uma resposta a tempo de um serviço upstream.");
+
+        // Genericos
+        public static Error FalhaDesserializacao => new Error(500, nameof(FalhaDesserializacao), "Falha ao desserializar os dados.");
+
+
+        // Auditoria
+        public static Error AuditoriaAcaoInvalida => new Error(400, nameof(AuditoriaAcaoInvalida), "Apenas registros com ação de Exclusão podem ser recuperados por este comando.");
+        public static Error AuditoriaSemDadosAntigos => new Error(500, nameof(AuditoriaSemDadosAntigos), "Não há dados antigos salvos para recuperar esta entidade.");
+        public static Error AuditoriaEntidadeNaoMapeada => new Error(500, nameof(AuditoriaEntidadeNaoMapeada), "Tipo de entidade não mapeado no DbContext.");
     }
 }

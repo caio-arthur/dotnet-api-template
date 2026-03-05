@@ -23,7 +23,7 @@ namespace API.ExceptionHandlers
             _logger.LogError(exception, "Ocorreu uma exceção: {Message}", exception.Message);
 
             var statusCode = (int)HttpStatusCode.InternalServerError;
-            var errorResponse = new Error(500, "Server.Error", "Ocorreu um erro interno.");
+            var errorResponse = Error.Default;
 
             if (exception is DomainException domainEx)
             {
