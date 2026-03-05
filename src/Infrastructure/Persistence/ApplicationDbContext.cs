@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Common.Primitives;
+using Domain.Entities;
 using Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -13,35 +14,13 @@ namespace Infrastructure.Persistence
         {
         }
 
-        public DbSet<MensagemOutbox> MensagensOutbox { get; set; }
+        public DbSet<RegistroAuditoria> RegistrosAuditoria => Set<RegistroAuditoria>();
+        public DbSet<MensagemOutbox> MensagensOutbox => Set<MensagemOutbox>();
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            // 1. Pega todas as entidades que foram modificadas e possuem eventos
-            var eventosDeDominio = ChangeTracker
-                .Entries<EntidadeBase>()
-                .Select(entry => entry.Entity)
-                .SelectMany(entity =>
-                {
-                    var eventos = entity.EventosDeDominio.ToList();
-                    entity.LimparEventosDeDominio(); // Limpa para não disparar duas vezes
-                    return eventos;
-                })
-                .ToList();
+            ProcessarEventosOutbox();
 
-            // 2. Converte os eventos para a nossa entidade Outbox
-            var mensagensOutbox = eventosDeDominio.Select(evento => new MensagemOutbox
-            {
-                Id = Guid.NewGuid(),
-                DataCriacao = DateTime.Now,
-                Tipo = evento.GetType().AssemblyQualifiedName!,
-                Conteudo = JsonSerializer.Serialize(evento, evento.GetType())
-            }).ToList();
-
-            // 3. Adiciona as mensagens no contexto atual
-            AddRange(mensagensOutbox);
-
-            // 4. Salva tudo na mesma transação (Seus dados + Eventos na Fila)
             return await base.SaveChangesAsync(cancellationToken);
         }
 
@@ -49,6 +28,32 @@ namespace Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
+
+        private void ProcessarEventosOutbox()
+        {
+            var eventosDeDominio = ChangeTracker
+                .Entries<EntidadeBase>()
+                .Select(entry => entry.Entity)
+                .SelectMany(entity =>
+                {
+                    var eventos = entity.EventosDeDominio.ToList();
+                    entity.LimparEventosDeDominio(); 
+                    return eventos;
+                })
+                .ToList();
+
+            if (!eventosDeDominio.Any())
+                return;
+
+            var mensagensOutbox = eventosDeDominio.Select(evento => new MensagemOutbox
+            {
+                DataCriacao = DateTime.Now,
+                Tipo = evento.GetType().AssemblyQualifiedName!,
+                Conteudo = JsonSerializer.Serialize(evento, evento.GetType())
+            }).ToList();
+
+            MensagensOutbox.AddRange(mensagensOutbox);
         }
     }
 }
