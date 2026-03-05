@@ -33,7 +33,7 @@ namespace Infrastructure.Persistence
         private void ProcessarEventosOutbox()
         {
             var eventosDeDominio = ChangeTracker
-                .Entries<EntidadeBase>()
+                .Entries<EntidadeComEventos>()
                 .Select(entry => entry.Entity)
                 .SelectMany(entity =>
                 {

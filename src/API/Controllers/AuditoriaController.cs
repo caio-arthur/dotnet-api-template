@@ -11,14 +11,14 @@ namespace API.Controllers
     public class AuditoriaController : ApiControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<Response<PaginatedList<RegistroAuditoriaDTO>>>> ListRegistrosAuditoria([FromQuery] ListRegistrosAuditoriaQuery query)
+        public async Task<ActionResult<Resposta<ListaPaginada<RegistroAuditoriaDTO>>>> ListRegistrosAuditoria([FromQuery] ListRegistrosAuditoriaQuery query)
         {
             var result = await Mediator.Send(query);
             return HandleResult(result);
         }
 
         [HttpPost("{id}/recuperar-registro")]
-        public async Task<ActionResult<Response<RecuperarRegistroExcluidoResponse>>> RecuperarRegistro(Guid id)
+        public async Task<ActionResult<Resposta<RecuperarRegistroExcluidoResponse>>> RecuperarRegistro(Guid id)
         {
             var command = new RecuperarRegistroExcluidoCommand { Id = id };
             var result = await Mediator.Send(command);

@@ -25,19 +25,19 @@ namespace Application.Handlers.Auditoria.Commands.RecuperarRegistroExcluido
 
                 if (auditoria == null)
                 {
-                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Registro de auditoria não encontrado.") { CustomState = Error.NotFound });
+                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Registro de auditoria não encontrado.") { CustomState = Erro.NotFound });
                     return;
                 }
 
                 if (auditoria.Acao != AuditoriaAcao.Exclusao)
                 {
-                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Ação inválida.") { CustomState = Error.AuditoriaAcaoInvalida });
+                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Ação inválida.") { CustomState = Erro.AuditoriaAcaoInvalida });
                     return;
                 }
 
                 if (string.IsNullOrEmpty(auditoria.ValoresAntigos))
                 {
-                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Dados antigos não encontrados.") { CustomState = Error.AuditoriaSemDadosAntigos });
+                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Dados antigos não encontrados.") { CustomState = Erro.AuditoriaSemDadosAntigos });
                     return;
                 }
 
@@ -46,7 +46,7 @@ namespace Application.Handlers.Auditoria.Commands.RecuperarRegistroExcluido
 
                 if (entityType == null)
                 {
-                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Entidade não mapeada.") { CustomState = Error.AuditoriaEntidadeNaoMapeada });
+                    context.AddFailure(new ValidationFailure(nameof(request.Id), "Entidade não mapeada.") { CustomState = Erro.AuditoriaEntidadeNaoMapeada });
                     return;
                 }
             });
