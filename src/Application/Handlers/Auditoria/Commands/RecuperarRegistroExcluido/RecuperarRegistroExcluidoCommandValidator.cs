@@ -20,7 +20,7 @@ namespace Application.Handlers.Auditoria.Commands.RecuperarRegistroExcluido
 
             RuleFor(x => x).CustomAsync(async (request, context, ct) =>
             {
-                var auditoria = await _context.RegistrosAuditoria
+                var auditoria = await _context.AuditoriaRegistros
                     .FirstOrDefaultAsync(a => a.Id == request.Id, ct);
 
                 if (auditoria == null)

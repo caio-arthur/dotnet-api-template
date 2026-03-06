@@ -14,7 +14,8 @@ services:
       - Database__Provider=Postgres
       - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=${DB_NAME:-local_db};Username=${DB_USER:-postgres};Password=${DB_PASS:-steel_symphony}
     depends_on:
-      - postgres-db
+      postgres-db:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -32,6 +33,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-local_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

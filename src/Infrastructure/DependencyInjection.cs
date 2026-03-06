@@ -26,11 +26,11 @@ namespace Infrastructure
 
                 if (string.Equals(provider, "Sqlite", StringComparison.OrdinalIgnoreCase))
                 {
-                    options.UseSqlite(connectionString);
+                    options.UseSqlite(connectionString, x => x.MigrationsHistoryTable(tableName: "migrations", schema: "infra"));
                 }
                 else if (string.Equals(provider, "Postgres", StringComparison.OrdinalIgnoreCase))
                 {
-                    options.UseNpgsql(connectionString);
+                    options.UseNpgsql(connectionString, x => x.MigrationsHistoryTable(tableName: "migrations", schema: "infra"));
                 }
                 else
                 {

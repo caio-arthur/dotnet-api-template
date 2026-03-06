@@ -38,7 +38,7 @@ namespace Infrastructure.Persistence.Interceptors
             var dataAtual = DateTime.Now;
 
             var entries = dbContext.ChangeTracker.Entries<IAuditableEntity>().ToList();
-            var registrosHistorico = new List<RegistroAuditoria>();
+            var registrosHistorico = new List<AuditoriaRegistro>();
 
             foreach (var entry in entries)
             {
@@ -66,7 +66,7 @@ namespace Infrastructure.Persistence.Interceptors
                         _ => AuditoriaAcao.NaoEspecificada
                     };
 
-                    var registro = new RegistroAuditoria
+                    var registro = new AuditoriaRegistro
                     {
                         Entidade = entry.Metadata.ClrType.Name,
                         Acao = acaoAuditoria,
@@ -99,7 +99,7 @@ namespace Infrastructure.Persistence.Interceptors
 
             if (registrosHistorico.Any())
             {
-                dbContext.Set<RegistroAuditoria>().AddRange(registrosHistorico);
+                dbContext.Set<AuditoriaRegistro>().AddRange(registrosHistorico);
             }
 
             return base.SavingChangesAsync(eventData, result, cancellationToken);

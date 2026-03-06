@@ -47,7 +47,7 @@ namespace API.Workers.Outbox
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>();
 
-            var mensagens = await dbContext.MensagensOutbox
+            var mensagens = await dbContext.OutboxMensagens
                 .Where(m => m.DataProcessamento == null)
                 .OrderBy(m => m.DataCriacao)
                 .Take(20)

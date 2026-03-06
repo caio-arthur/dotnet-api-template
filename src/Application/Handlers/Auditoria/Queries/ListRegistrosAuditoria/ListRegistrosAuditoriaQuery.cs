@@ -25,13 +25,13 @@ namespace Application.Handlers.Auditoria.Queries.ListRegistrosAuditoria
         }
         public async Task<Resposta<ListaPaginada<RegistroAuditoriaDTO>>> Handle(ListRegistrosAuditoriaQuery request, CancellationToken cancellationToken)
         {
-            var mapper = new GridifyMapper<RegistroAuditoria>()
+            var mapper = new GridifyMapper<AuditoriaRegistro>()
                 .GenerateMappings();
 
-            var gridifyQueryable = _context.RegistrosAuditoria
+            var gridifyQueryable = _context.AuditoriaRegistros
                .GridifyQueryable(request, mapper);
 
-            var paginatedList = await gridifyQueryable.ProjectToListaPaginadaAsync<RegistroAuditoria, RegistroAuditoriaDTO>(
+            var paginatedList = await gridifyQueryable.ProjectToListaPaginadaAsync<AuditoriaRegistro, RegistroAuditoriaDTO>(
                 _mapper.ConfigurationProvider,
                 request.Page,
                 request.PageSize,
