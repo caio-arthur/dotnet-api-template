@@ -21,7 +21,22 @@ namespace Infrastructure
 
             services.AddDbContext<ApplicationDbContext>((sp, options) =>
             {
-                options.UseSqlite(configuration.GetConnectionString("SqliteConnection"));
+                var provider = configuration.GetValue<string>("Database:Provider");
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+                if (string.Equals(provider, "Sqlite", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseSqlite(connectionString);
+                }
+                else if (string.Equals(provider, "Postgres", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseNpgsql(connectionString);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Provedor de banco de dados não suportado: {provider}");
+                }
+
                 options.AddInterceptors(sp.GetRequiredService<AtualizarEntidadesAuditaveisInterceptor>());
             });
 
