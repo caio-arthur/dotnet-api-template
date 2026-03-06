@@ -24,7 +24,7 @@ namespace Application.Handlers.Auditoria.Commands.RecuperarRegistroExcluido
 
         public async Task<Resposta<RecuperarRegistroExcluidoResponse>> Handle(RecuperarRegistroExcluidoCommand request, CancellationToken cancellationToken)
         {
-            var auditoria = await _context.RegistrosAuditoria
+            var auditoria = await _context.AuditoriaRegistros
                 .FirstAsync(a => a.Id == request.Id, cancellationToken);
 
             var entityType = _context.Model.GetEntityTypes()

@@ -20,7 +20,8 @@ namespace API
 
             services.Configure<OutboxOptions>(Configuration.GetSection(OutboxOptions.SectionName));
             var outboxOptions = Configuration.GetSection(OutboxOptions.SectionName).Get<OutboxOptions>();
-            if (outboxOptions is not null && outboxOptions.Habilitado)
+            if (outboxOptions is not null &&
+                outboxOptions.Habilitado)
             {
                 services.AddHostedService<ProcessadorOutboxBackgroundService>();
             }
@@ -37,15 +38,15 @@ namespace API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
+            //if (env.IsDevelopment())
+            //{
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
                     c.DocExpansion(DocExpansion.None);
                     c.DefaultModelsExpandDepth(-1);
                 });
-            }
+            //}
 
             app.UseHttpsRedirection();
             app.UseRouting();

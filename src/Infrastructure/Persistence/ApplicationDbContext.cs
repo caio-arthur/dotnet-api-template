@@ -14,8 +14,8 @@ namespace Infrastructure.Persistence
         {
         }
 
-        public DbSet<RegistroAuditoria> RegistrosAuditoria { get; set; }
-        public DbSet<MensagemOutbox> MensagensOutbox => Set<MensagemOutbox>();
+        public DbSet<AuditoriaRegistro> AuditoriaRegistros { get; set; }
+        public DbSet<OutboxMensagens> OutboxMensagens => Set<OutboxMensagens>();
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -27,6 +27,8 @@ namespace Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.HasDefaultSchema("dominio");
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
@@ -46,14 +48,14 @@ namespace Infrastructure.Persistence
             if (!eventosDeDominio.Any())
                 return;
 
-            var mensagensOutbox = eventosDeDominio.Select(evento => new MensagemOutbox
+            var mensagensOutbox = eventosDeDominio.Select(evento => new OutboxMensagens
             {
                 DataCriacao = DateTime.Now,
                 Tipo = evento.GetType().AssemblyQualifiedName!,
                 Conteudo = JsonSerializer.Serialize(evento, evento.GetType())
             }).ToList();
 
-            MensagensOutbox.AddRange(mensagensOutbox);
+            OutboxMensagens.AddRange(mensagensOutbox);
         }
     }
 }

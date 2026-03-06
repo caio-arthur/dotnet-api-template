@@ -8,7 +8,7 @@ namespace Application.Common.Interfaces
 {
     public interface IApplicationDbContext
     {
-        DbSet<RegistroAuditoria> RegistrosAuditoria { get; set; }
+        DbSet<AuditoriaRegistro> AuditoriaRegistros { get; set; }
         IModel Model { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DatabaseFacade Database { get; }
