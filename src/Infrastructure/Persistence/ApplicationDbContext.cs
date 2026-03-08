@@ -28,8 +28,18 @@ namespace Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
+            if (Database.IsNpgsql()) ConfigurePostgres(modelBuilder);
             modelBuilder.HasDefaultSchema("dominio");
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
+
+        public static void ConfigurePostgres(ModelBuilder modelBuilder)
+        {
+            modelBuilder.HasCollation(
+                name: "case_insensitive",
+                locale: "und-u-ks-level1",
+                provider: "icu",
+                deterministic: false);
         }
 
         private void ProcessarEventosOutbox()
@@ -40,7 +50,7 @@ namespace Infrastructure.Persistence
                 .SelectMany(entity =>
                 {
                     var eventos = entity.EventosDeDominio.ToList();
-                    entity.LimparEventosDeDominio(); 
+                    entity.LimparEventosDeDominio();
                     return eventos;
                 })
                 .ToList();
@@ -57,5 +67,6 @@ namespace Infrastructure.Persistence
 
             OutboxMensagens.AddRange(mensagensOutbox);
         }
+
     }
 }
