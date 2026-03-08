@@ -42,18 +42,21 @@ namespace API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseExceptionHandler();
+
             //if (env.IsDevelopment())
             //{
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.DocExpansion(DocExpansion.None);
-                    c.DefaultModelsExpandDepth(-1);
-                });
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.DocExpansion(DocExpansion.None);
+                c.DefaultModelsExpandDepth(-1);
+            });
             //}
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors("DefaultCorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<VerificacaoBanimentoMiddleware>();
