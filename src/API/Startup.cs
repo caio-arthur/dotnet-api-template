@@ -1,4 +1,6 @@
 ﻿using API.ExceptionHandlers;
+using API.Extensions;
+using API.Middlewares;
 using API.Workers.Outbox;
 using Application;
 using Infrastructure;
@@ -34,6 +36,8 @@ namespace API
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
 
+            services.AddConfiguracaoRateLimit(Configuration);
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -52,6 +56,8 @@ namespace API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<VerificacaoBanimentoMiddleware>();
+            app.UseRateLimiter();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

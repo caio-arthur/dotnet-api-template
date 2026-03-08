@@ -19,6 +19,8 @@ namespace Infrastructure
             services.Configure<AuditoriaOptions>(configuration.GetSection(AuditoriaOptions.SectionName));
             services.AddScoped<AtualizarEntidadesAuditaveisInterceptor>();
 
+            services.AddScoped<IUserPenaltyService, UserPenaltyService>();
+
             services.AddDbContext<ApplicationDbContext>((sp, options) =>
             {
                 var provider = configuration.GetValue<string>("Database:Provider");
