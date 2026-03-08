@@ -15,7 +15,8 @@ namespace Infrastructure.Persistence
         }
 
         public DbSet<AuditoriaRegistro> AuditoriaRegistros { get; set; }
-        public DbSet<OutboxMensagens> OutboxMensagens => Set<OutboxMensagens>();
+        public DbSet<OutboxMensagens> OutboxMensagens { get; set; }
+        public DbSet<PenalidadeUsuario> PenalidadeUsuarios { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
